@@ -4082,8 +4082,31 @@ class _PolygonalChainSelector(_SelectorWidget):
         # support the 'move_all' state modifier).
         self._xys_at_press = self._xys.copy()
 
-    def something():
-        pass
+    @_call_with_reparented_event
+    def _release(self, event):
+        """Button release event handler."""
+        # Release active tool handle.
+        if self._active_handle_idx >= 0:
+            if event.button == 3:
+                self.remove_vertex(self._active_handle_idx)
+                self._draw_polygon()
+            self._active_handle_idx = -1
+
+        # Verify closed polygonal chain completion.
+        elif self._verify_completion():
+            pass
+
+        # Place new vertex.
+        elif (not self._selection_completed
+              and 'move_all' not in self._state
+              and 'move_vertex' not in self._state):
+            self._place_vertex(event)
+
+        if self._selection_completed:
+            self.onselect(self.verts)
+
+    def _place_vertex(self, event):
+        """Place a vertex at the position of the given event."""
 
 
 class PolygonSelector(_PolygonalChainSelector):
@@ -4263,31 +4286,15 @@ class PolygonSelector(_PolygonalChainSelector):
             # start drawing again
             self._selection_completed = False
             self._remove_box()
-
-    @_call_with_reparented_event
-    def _release(self, event):
-        """Button release event handler."""
-        # Release active tool handle.
-        if self._active_handle_idx >= 0:
-            if event.button == 3:
-                self.remove_vertex(self._active_handle_idx)
-                self._draw_polygon()
-            self._active_handle_idx = -1
-
-        # Complete the polygon.
         elif len(self._xys) > 3 and self._xys[-1] == self._xys[0]:
             self._selection_completed = True
             if self._draw_box and self._box is None:
                 self._add_box()
+            return True
 
-        # Place new vertex.
-        elif (not self._selection_completed
-              and 'move_all' not in self._state
-              and 'move_vertex' not in self._state):
-            self._xys.insert(-1, (event.xdata, event.ydata))
-
-        if self._selection_completed:
-            self.onselect(self.verts)
+    def _place_vertex(self, event):
+        """Place a vertex at the position of the given event."""
+        self._xys.insert(-1, (event.xdata, event.ydata))
 
     @_call_with_reparented_event
     def onmove(self, event):
@@ -4527,24 +4534,9 @@ class PolylineSelector(_PolygonalChainSelector):
             # drawing again
             self._selection_completed = False
 
-    @_call_with_reparented_event
-    def _release(self, event):
-        """Button release event handler."""
-        # Release active tool handle.
-        if self._active_handle_idx >= 0:
-            if event.button == 3:
-                self.remove_vertex(self._active_handle_idx)
-                self._draw_polygon()
-            self._active_handle_idx = -1
-
-        # Place new vertex.
-        elif (not self._selection_completed
-              and 'move_all' not in self._state
-              and 'move_vertex' not in self._state):
-            self._xys.append((event.xdata, event.ydata))
-
-        if self._selection_completed:
-            self.onselect(self.verts)
+    def _place_vertex(self, event):
+        """Place a vertex at the position of the given event."""
+        self._xys.append((event.xdata, event.ydata))
 
     @_call_with_reparented_event
     def onmove(self, event):
