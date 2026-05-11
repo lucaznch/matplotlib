@@ -4054,6 +4054,22 @@ class _PolygonalChainSelector(_SelectorWidget):
     def _handles_artists(self):
         return self._polygon_handles.artists
 
+    def remove_vertex(self, i):
+        if self._selection_completed:
+            # Pretty sure this condition is not needed since the _press() function
+            # verifies this condition before activating the vertex handle,
+            # where _release() sees the handle activation and calls remove_vertex().
+            # but keeping it here for safety until the implementation is complete.
+            # And I suppose it doesn't hurt to have this check here.
+            self._remove_vertex(i)
+            self._update_completion()
+
+    def _remove_vertex(self, i):
+        """Remove vertex i from the polygonal chain."""
+
+    def _update_completion(self):
+        """Update selection state after vertex removal."""
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4215,18 +4231,18 @@ class PolygonSelector(_PolygonalChainSelector):
 
     def _remove_vertex(self, i):
         """Remove vertex with index i."""
-        if (len(self._xys) > 2 and
-                self._selection_completed and
-                i in (0, len(self._xys) - 1)):
+        if (len(self._xys) > 2 and i in (0, len(self._xys) - 1)):
             # If selecting the first or final vertex, remove both first and
             # last vertex as they are the same for a closed polygon
             self._xys.pop(0)
             self._xys.pop(-1)
-            # Close the polygon again by appending the new first vertex to the
-            # end
+            # Close the polygon again by appending the new first vertex to the end
             self._xys.append(self._xys[0])
         else:
             self._xys.pop(i)
+
+    def _update_completion(self):
+        """"Update selection state after vertex removal."""
         if len(self._xys) <= 2:
             # If only one point left, return to incomplete state to let user
             # start drawing again
@@ -4251,7 +4267,7 @@ class PolygonSelector(_PolygonalChainSelector):
         # Release active tool handle.
         if self._active_handle_idx >= 0:
             if event.button == 3:
-                self._remove_vertex(self._active_handle_idx)
+                self.remove_vertex(self._active_handle_idx)
                 self._draw_polygon()
             self._active_handle_idx = -1
 
@@ -4500,6 +4516,9 @@ class PolylineSelector(_PolygonalChainSelector):
     def _remove_vertex(self, i):
         """Remove vertex with index i."""
         self._xys.pop(i)
+
+    def _update_completion(self):
+        """Update selection state after vertex removal."""
         if len(self._xys) == 0:
             # If no points left, return to incomplete state to let user start
             # drawing again
@@ -4523,7 +4542,7 @@ class PolylineSelector(_PolygonalChainSelector):
         # Release active tool handle.
         if self._active_handle_idx >= 0:
             if event.button == 3:
-                self._remove_vertex(self._active_handle_idx)
+                self.remove_vertex(self._active_handle_idx)
                 self._draw_polygon()
             self._active_handle_idx = -1
 
