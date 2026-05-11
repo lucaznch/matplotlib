@@ -4196,6 +4196,11 @@ class _PolygonalChainSelector(_SelectorWidget):
             self._remove_box()
             self.set_visible(True)
 
+    def _draw_polygon(self):
+        """Redraw the polygon based on the new vertex positions."""
+        self._draw_polygon_without_update()
+        self.update()
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4420,11 +4425,6 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._polygon_handles.set_data(xs, ys)
 
-    def _draw_polygon(self):
-        """Redraw the polygon based on the new vertex positions."""
-        self._draw_polygon_without_update()
-        self.update()
-
     @property
     def verts(self):
         """The polygon vertices, as a list of ``(x, y)`` pairs."""
@@ -4586,11 +4586,6 @@ class PolylineSelector(_PolygonalChainSelector):
         # if the polygon is completed or the user is locked on to the start
         # vertex.
         self._polygon_handles.set_data(xs, ys)
-
-    def _draw_polygon(self):
-        """Redraw the polygon based on the new vertex positions."""
-        self._draw_polygon_without_update()
-        self.update()
 
     @property
     def verts(self):
