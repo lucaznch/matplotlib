@@ -4070,6 +4070,21 @@ class _PolygonalChainSelector(_SelectorWidget):
     def _update_completion(self):
         """Update selection state after vertex removal."""
 
+    def _press(self, event):
+        """Button press event handler."""
+        # Check for selection of a tool handle.
+        if ((self._selection_completed or 'move_vertex' in self._state)
+                and len(self._xys) > 0):
+            h_idx, h_dist = self._polygon_handles.closest(event.x, event.y)
+            if h_dist < self.grab_range:
+                self._active_handle_idx = h_idx
+        # Save the vertex positions at the time of the press event (needed to
+        # support the 'move_all' state modifier).
+        self._xys_at_press = self._xys.copy()
+
+    def something():
+        pass
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4248,18 +4263,6 @@ class PolygonSelector(_PolygonalChainSelector):
             # start drawing again
             self._selection_completed = False
             self._remove_box()
-
-    def _press(self, event):
-        """Button press event handler."""
-        # Check for selection of a tool handle.
-        if ((self._selection_completed or 'move_vertex' in self._state)
-                and len(self._xys) > 0):
-            h_idx, h_dist = self._polygon_handles.closest(event.x, event.y)
-            if h_dist < self.grab_range:
-                self._active_handle_idx = h_idx
-        # Save the vertex positions at the time of the press event (needed to
-        # support the 'move_all' state modifier).
-        self._xys_at_press = self._xys.copy()
 
     @_call_with_reparented_event
     def _release(self, event):
@@ -4523,18 +4526,6 @@ class PolylineSelector(_PolygonalChainSelector):
             # If no points left, return to incomplete state to let user start
             # drawing again
             self._selection_completed = False
-
-    def _press(self, event):
-        """Button press event handler."""
-        # Check for selection of a tool handle.
-        if ((self._selection_completed or 'move_vertex' in self._state)
-                and len(self._xys) > 0):
-            h_idx, h_dist = self._polygon_handles.closest(event.x, event.y)
-            if h_dist < self.grab_range:
-                self._active_handle_idx = h_idx
-        # Save the vertex positions at the time of the press event (needed to
-        # support the 'move_all' state modifier).
-        self._xys_at_press = self._xys.copy()
 
     @_call_with_reparented_event
     def _release(self, event):
