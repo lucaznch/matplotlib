@@ -4062,13 +4062,13 @@ class _PolygonalChainSelector(_SelectorWidget):
             # but keeping it here for safety until the implementation is complete.
             # And I suppose it doesn't hurt to have this check here.
             self._remove_vertex(i)
-            self._update_completion()
+            self._verify_completion()
 
     def _remove_vertex(self, i):
         """Remove vertex i from the polygonal chain."""
 
-    def _update_completion(self):
-        """Update selection state after vertex removal."""
+    def _verify_completion(self):
+        """Verify and update selection state."""
 
     def _press(self, event):
         """Button press event handler."""
@@ -4256,8 +4256,8 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._xys.pop(i)
 
-    def _update_completion(self):
-        """"Update selection state after vertex removal."""
+    def _verify_completion(self):
+        """"Verify and update selection state."""
         if len(self._xys) <= 2:
             # If only one point left, return to incomplete state to let user
             # start drawing again
@@ -4520,8 +4520,8 @@ class PolylineSelector(_PolygonalChainSelector):
         """Remove vertex with index i."""
         self._xys.pop(i)
 
-    def _update_completion(self):
-        """Update selection state after vertex removal."""
+    def _verify_completion(self):
+        """Verify and update selection state."""
         if len(self._xys) == 0:
             # If no points left, return to incomplete state to let user start
             # drawing again
