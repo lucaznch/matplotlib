@@ -4175,6 +4175,27 @@ class _PolygonalChainSelector(_SelectorWidget):
             self._xys.pop()
             self._draw_polygon()
 
+    def _on_key_release(self, event):
+        """Key release event handler."""
+        # Add back the pending vertex if leaving the 'move_vertex' or
+        # 'move_all' mode (by checking the released key)
+        if (not self._selection_completed
+                and
+                (event.key == self._state_modifier_keys.get('move_vertex')
+                 or event.key == self._state_modifier_keys.get('move_all'))):
+            self._xys.append((event.xdata, event.ydata))
+            self._draw_polygon()
+        # Complete the open polygonal chain.
+        elif self._verify_completion(event):
+            self._complete_chain(event)
+        # Reset the polygon if the released key is the 'clear' key.
+        elif event.key == self._state_modifier_keys.get('clear'):
+            event = self._clean_event(event)
+            self._xys = [(event.xdata, event.ydata)]
+            self._selection_completed = False
+            self._remove_box()
+            self.set_visible(True)
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4384,24 +4405,6 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._xys[-1] = (event.xdata, event.ydata)
 
-    def _on_key_release(self, event):
-        """Key release event handler."""
-        # Add back the pending vertex if leaving the 'move_vertex' or
-        # 'move_all' mode (by checking the released key)
-        if (not self._selection_completed
-                and
-                (event.key == self._state_modifier_keys.get('move_vertex')
-                 or event.key == self._state_modifier_keys.get('move_all'))):
-            self._xys.append((event.xdata, event.ydata))
-            self._draw_polygon()
-        # Reset the polygon if the released key is the 'clear' key.
-        elif event.key == self._state_modifier_keys.get('clear'):
-            event = self._clean_event(event)
-            self._xys = [(event.xdata, event.ydata)]
-            self._selection_completed = False
-            self._remove_box()
-            self.set_visible(True)
-
     def _draw_polygon_without_update(self):
         """Redraw the polygon based on new vertex positions, no update()."""
         xs, ys = zip(*self._xys) if self._xys else ([], [])
@@ -4559,6 +4562,12 @@ class PolylineSelector(_PolygonalChainSelector):
         return (not self._selection_completed
                 and event.key == 'enter' and len(self._xys) > 1)
 
+    def _complete_chain(self, event):
+        self._xys.pop()
+        self._selection_completed = True
+        self._draw_polygon()
+        self.onselect(self.verts)
+
     def _place_vertex(self, event):
         """Place a vertex at the position of the given event."""
         self._xys.append((event.xdata, event.ydata))
@@ -4568,29 +4577,6 @@ class PolylineSelector(_PolygonalChainSelector):
             self._xys.append((event.xdata, event.ydata))
         else:
             self._xys[-1] = (event.xdata, event.ydata)
-
-    def _on_key_release(self, event):
-        """Key release event handler."""
-        # Add back the pending vertex if leaving the 'move_vertex' or
-        # 'move_all' mode (by checking the released key)
-        if (not self._selection_completed
-                and
-                (event.key == self._state_modifier_keys.get('move_vertex')
-                 or event.key == self._state_modifier_keys.get('move_all'))):
-            self._xys.append((event.xdata, event.ydata))
-            self._draw_polygon()
-        elif (not self._selection_completed
-              and event.key == 'enter' and len(self._xys) > 1):
-            self._xys.pop()
-            self._selection_completed = True
-            self._draw_polygon()
-            self.onselect(self.verts)
-        # Reset the polygon if the released key is the 'clear' key.
-        elif event.key == self._state_modifier_keys.get('clear'):
-            event = self._clean_event(event)
-            self._xys = [(event.xdata, event.ydata)]
-            self._selection_completed = False
-            self.set_visible(True)
 
     def _draw_polygon_without_update(self):
         """Redraw the polygon based on new vertex positions, no update()."""
