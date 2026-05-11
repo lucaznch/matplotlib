@@ -4108,6 +4108,25 @@ class _PolygonalChainSelector(_SelectorWidget):
     def _place_vertex(self, event):
         """Place a vertex at the position of the given event."""
 
+    @_call_with_reparented_event
+    def onmove(self, event):
+        """Cursor move event handler and validator."""
+        # Method overrides _SelectorWidget.onmove because the polygon selector
+        # needs to process the move callback even if there is no button press.
+        # _SelectorWidget.onmove include logic to ignore move event if
+        # _eventpress is None.
+        if self.ignore(event):
+            # Hide the cursor when interactive zoom/pan is active
+            if not self.canvas.widgetlock.available(self) and self._xys:
+                self._xys[-1] = (np.nan, np.nan)
+                self._draw_polygon()
+            return False
+
+        else:
+            event = self._clean_event(event)
+            self._onmove(event)
+            return True
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4295,25 +4314,6 @@ class PolygonSelector(_PolygonalChainSelector):
     def _place_vertex(self, event):
         """Place a vertex at the position of the given event."""
         self._xys.insert(-1, (event.xdata, event.ydata))
-
-    @_call_with_reparented_event
-    def onmove(self, event):
-        """Cursor move event handler and validator."""
-        # Method overrides _SelectorWidget.onmove because the polygon selector
-        # needs to process the move callback even if there is no button press.
-        # _SelectorWidget.onmove include logic to ignore move event if
-        # _eventpress is None.
-        if self.ignore(event):
-            # Hide the cursor when interactive zoom/pan is active
-            if not self.canvas.widgetlock.available(self) and self._xys:
-                self._xys[-1] = (np.nan, np.nan)
-                self._draw_polygon()
-            return False
-
-        else:
-            event = self._clean_event(event)
-            self._onmove(event)
-            return True
 
     def _onmove(self, event):
         """Cursor move event handler."""
@@ -4537,25 +4537,6 @@ class PolylineSelector(_PolygonalChainSelector):
     def _place_vertex(self, event):
         """Place a vertex at the position of the given event."""
         self._xys.append((event.xdata, event.ydata))
-
-    @_call_with_reparented_event
-    def onmove(self, event):
-        """Cursor move event handler and validator."""
-        # Method overrides _SelectorWidget.onmove because the polygon selector
-        # needs to process the move callback even if there is no button press.
-        # _SelectorWidget.onmove include logic to ignore move event if
-        # _eventpress is None.
-        if self.ignore(event):
-            # Hide the cursor when interactive zoom/pan is active
-            if not self.canvas.widgetlock.available(self) and self._xys:
-                self._xys[-1] = (np.nan, np.nan)
-                self._draw_polygon()
-            return False
-
-        else:
-            event = self._clean_event(event)
-            self._onmove(event)
-            return True
 
     def _onmove(self, event):
         """Cursor move event handler."""
