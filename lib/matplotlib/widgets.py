@@ -4159,6 +4159,16 @@ class _PolygonalChainSelector(_SelectorWidget):
     def _move_pending_vertex(self, event):
         """Move the pending vertex to the position of the given event."""
 
+    def _on_key_press(self, event):
+        """Key press event handler."""
+        # Remove the pending vertex if entering the 'move_vertex' or
+        # 'move_all' mode
+        if (not self._selection_completed
+                and ('move_vertex' in self._state or
+                     'move_all' in self._state)):
+            self._xys.pop()
+            self._draw_polygon()
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4365,16 +4375,6 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._xys[-1] = (event.xdata, event.ydata)
 
-    def _on_key_press(self, event):
-        """Key press event handler."""
-        # Remove the pending vertex if entering the 'move_vertex' or
-        # 'move_all' mode
-        if (not self._selection_completed
-                and ('move_vertex' in self._state or
-                     'move_all' in self._state)):
-            self._xys.pop()
-            self._draw_polygon()
-
     def _on_key_release(self, event):
         """Key release event handler."""
         # Add back the pending vertex if leaving the 'move_vertex' or
@@ -4555,16 +4555,6 @@ class PolylineSelector(_PolygonalChainSelector):
             self._xys.append((event.xdata, event.ydata))
         else:
             self._xys[-1] = (event.xdata, event.ydata)
-
-    def _on_key_press(self, event):
-        """Key press event handler."""
-        # Remove the pending vertex if entering the 'move_vertex' or
-        # 'move_all' mode
-        if (not self._selection_completed
-                and ('move_vertex' in self._state or
-                     'move_all' in self._state)):
-            self._xys.pop()
-            self._draw_polygon()
 
     def _on_key_release(self, event):
         """Key release event handler."""
