@@ -4190,16 +4190,20 @@ class _PolygonalChainSelector(_SelectorWidget):
             self._complete_chain(event)
         # Reset the polygon if the released key is the 'clear' key.
         elif event.key == self._state_modifier_keys.get('clear'):
-            event = self._clean_event(event)
-            self._xys = [(event.xdata, event.ydata)]
-            self._selection_completed = False
-            self._remove_box()
-            self.set_visible(True)
+            self._reset_chain(event)
+
+    def _reset_chain(self, event):
+        """Reset the polygonal chain."""
 
     def _draw_polygon(self):
         """Redraw the polygon based on the new vertex positions."""
         self._draw_polygon_without_update()
         self.update()
+
+    def _clear_without_update(self):
+        self._selection_completed = False
+        self._xys = [(0, 0)]
+        self._draw_polygon_without_update()
 
 
 class PolygonSelector(_PolygonalChainSelector):
@@ -4410,6 +4414,13 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._xys[-1] = (event.xdata, event.ydata)
 
+    def _reset_chain(self, event):
+        event = self._clean_event(event)
+        self._xys = [(event.xdata, event.ydata)]
+        self._selection_completed = False
+        self._remove_box()
+        self.set_visible(True)
+
     def _draw_polygon_without_update(self):
         """Redraw the polygon based on new vertex positions, no update()."""
         xs, ys = zip(*self._xys) if self._xys else ([], [])
@@ -4444,11 +4455,6 @@ class PolygonSelector(_PolygonalChainSelector):
         if self._draw_box and self._box is None:
             self._add_box()
         self._draw_polygon()
-
-    def _clear_without_update(self):
-        self._selection_completed = False
-        self._xys = [(0, 0)]
-        self._draw_polygon_without_update()
 
 
 class Lasso(AxesWidget):
@@ -4578,6 +4584,12 @@ class PolylineSelector(_PolygonalChainSelector):
         else:
             self._xys[-1] = (event.xdata, event.ydata)
 
+    def _reset_chain(self, event):
+        event = self._clean_event(event)
+        self._xys = [(event.xdata, event.ydata)]
+        self._selection_completed = False
+        self.set_visible(True)
+
     def _draw_polygon_without_update(self):
         """Redraw the polygon based on new vertex positions, no update()."""
         xs, ys = zip(*self._xys) if self._xys else ([], [])
@@ -4604,8 +4616,3 @@ class PolylineSelector(_PolygonalChainSelector):
         self._selection_completed = True
         self.set_visible(True)
         self._draw_polygon()
-
-    def _clear_without_update(self):
-        self._selection_completed = False
-        self._xys = [(0, 0)]
-        self._draw_polygon_without_update()
