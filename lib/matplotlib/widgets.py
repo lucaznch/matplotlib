@@ -4038,6 +4038,9 @@ class _PolygonalChainSelector(_SelectorWidget):
             handle_props = dict(markeredgecolor='k',
                                 markerfacecolor=props.get('color', 'k'))
         self._handle_props = handle_props
+
+        # TODO: Change the name of this attribute to something else.
+        # e.g., _vertex_handles, _chain_handles, etc.
         self._polygon_handles = ToolHandles(self.ax, [], [],
                                             useblit=self._useblit,
                                             marker_props=self._handle_props)
@@ -4046,6 +4049,10 @@ class _PolygonalChainSelector(_SelectorWidget):
         self.grab_range = grab_range
 
         self.set_visible(True)
+
+    @property
+    def _handles_artists(self):
+        return self._polygon_handles.artists
 
 
 class PolygonSelector(_PolygonalChainSelector):
@@ -4142,10 +4149,7 @@ class PolygonSelector(_PolygonalChainSelector):
         # The OG code had a but here:
         # self._box_handle_props = self._handle_props.update(box_handle_props)
 
-        self._box_handle_props = {
-            **self._handle_props,
-            **box_handle_props
-        }
+        self._box_handle_props = {**self._handle_props, **box_handle_props}
         self._box_props = box_props
 
     def _get_bbox(self):
@@ -4208,10 +4212,6 @@ class PolygonSelector(_PolygonalChainSelector):
         self._xys = [*new_verts, new_verts[0]]
         self._draw_polygon()
         self._old_box_extents = self._box.extents
-
-    @property
-    def _handles_artists(self):
-        return self._polygon_handles.artists
 
     def _remove_vertex(self, i):
         """Remove vertex with index i."""
@@ -4496,10 +4496,6 @@ class PolylineSelector(_PolygonalChainSelector):
                          handle_props=handle_props, grab_range=grab_range)
 
         self._xys = [(0, 0)]
-
-    @property
-    def _handles_artists(self):
-        return self._polygon_handles.artists
 
     def _remove_vertex(self, i):
         """Remove vertex with index i."""
