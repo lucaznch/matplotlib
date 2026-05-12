@@ -4201,7 +4201,7 @@ class _PolygonalChainSelector(_SelectorWidget):
 
     @property
     def verts(self):
-        """The polygon vertices, as a list of ``(x, y)`` pairs."""
+        """The polygonal chain vertices, as a list of ``(x, y)`` pairs."""
         return self._get_vertices()
 
     def _get_vertices(self):
@@ -4211,10 +4211,10 @@ class _PolygonalChainSelector(_SelectorWidget):
     @verts.setter
     def verts(self, xys):
         """
-        Set the polygon vertices.
+        Set the polygonal vertices.
 
-        This will remove any preexisting vertices, creating a complete polygon
-        with the new vertices.
+        This will remove any preexisting vertices,
+        creating a complete polygonal chain with the new vertices.
         """
         self._xys = self._build_vertices(xys)
         self._selection_completed = True
@@ -4227,7 +4227,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         return [*xys]
 
     def _post_set_verts(self):
-        """Post-processing after setting vertices, e.g., updating the display."""
+        """Post-processing after setting vertices."""
         pass
 
 
@@ -4465,7 +4465,7 @@ class PolygonSelector(_PolygonalChainSelector):
             self._vertex_handles.set_data(xs, ys)
 
     def _get_vertices(self):
-        """Return the polygon vertices as a list of ``(x, y)`` pairs."""
+        """Get polygonal chain vertices as a list of ``(x, y)`` pairs."""
         return self._xys[:-1]
 
     def _build_vertices(self, xys):
@@ -4473,6 +4473,7 @@ class PolygonSelector(_PolygonalChainSelector):
         return [*xys, xys[0]]
 
     def _post_set_verts(self):
+        """Post-processing after setting vertices."""
         if self._draw_box and self._box is None:
             self._add_box()
 
