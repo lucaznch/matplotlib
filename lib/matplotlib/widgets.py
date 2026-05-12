@@ -4009,7 +4009,6 @@ class _PolygonalChainSelector(_SelectorWidget):
 
     def __init__(self, ax, onselect=None, *, useblit=False,
                  props=None, handle_props=None, grab_range=10):
-
         # The state modifiers 'move', 'square', and 'center' are expected by
         # _SelectorWidget but are not supported by polygonal chain selectors.
         # Note: could not use the existing 'move' state modifier in-place of
@@ -4020,20 +4019,21 @@ class _PolygonalChainSelector(_SelectorWidget):
             move='not-applicable', square='not-applicable',
             center='not-applicable', rotate='not-applicable')
 
-        # _SelectorWidget's constructor.
         super().__init__(ax, onselect, useblit=useblit,
                          state_modifier_keys=state_modifier_keys)
 
-        # TODO: Should xys be initialized at the subclass level instead of here?
-        # I think so.
-        # self._xys = [(0, 0)]
+        # Sequence of vertices defining the polygonal chain.
+        # Initialized with the pending vertex.
+        self._xys = [(0, 0)]
 
+        # Line segment properties.
         if props is None:
             props = dict(color='k', linestyle='-', linewidth=2, alpha=0.5)
         props = {**props, 'animated': self._useblit}
         self._selection_artist = line = Line2D([], [], **props)
         self.ax.add_line(line)
 
+        # Vertex marker properties.
         if handle_props is None:
             handle_props = dict(markeredgecolor='k',
                                 markerfacecolor=props.get('color', 'k'))
@@ -4330,8 +4330,6 @@ class PolygonSelector(_PolygonalChainSelector):
         super().__init__(ax, onselect, useblit=useblit, props=props,
                          handle_props=handle_props, grab_range=grab_range)
 
-        self._xys = [(0, 0)]
-
         self._draw_box = draw_bounding_box
         self._box = None
 
@@ -4575,11 +4573,8 @@ class PolylineSelector(_PolygonalChainSelector):
 
     def __init__(self, ax, onselect=None, *, useblit=False,
                  props=None, handle_props=None, grab_range=10):
-
         super().__init__(ax, onselect, useblit=useblit, props=props,
                          handle_props=handle_props, grab_range=grab_range)
-
-        self._xys = [(0, 0)]
 
     def _remove_vertex(self, i):
         """Remove vertex with index i."""
