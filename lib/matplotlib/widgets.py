@@ -4022,25 +4022,20 @@ class _PolygonalChainSelector(_SelectorWidget):
         super().__init__(ax, onselect, useblit=useblit,
                          state_modifier_keys=state_modifier_keys)
 
-        # Sequence of vertices defining the polygonal chain.
-        # Initialized with the pending vertex.
+        # Sequence of vertices defining the polygonal chain,
+        # initialized with a pending vertex.
         self._xys = [(0, 0)]
 
-        # Line segment properties.
         if props is None:
             props = dict(color='k', linestyle='-', linewidth=2, alpha=0.5)
         props = {**props, 'animated': self._useblit}
         self._selection_artist = line = Line2D([], [], **props)
         self.ax.add_line(line)
 
-        # Vertex marker properties.
         if handle_props is None:
             handle_props = dict(markeredgecolor='k',
                                 markerfacecolor=props.get('color', 'k'))
         self._handle_props = handle_props
-
-        # TODO: Change the name of this attribute to something else.
-        # e.g., _vertex_handles, _chain_handles, etc.
         self._vertex_handles = ToolHandles(self.ax, [], [],
                                             useblit=self._useblit,
                                             marker_props=self._handle_props)
