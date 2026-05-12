@@ -4080,7 +4080,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         if self._active_handle_idx >= 0:
             if event.button == 3:
                 self.remove_vertex(self._active_handle_idx)
-                self._draw_polygon()
+                self._draw_polygonal_chain()
             self._active_handle_idx = -1
 
         # Verify closed polygonal chain completion.
@@ -4116,7 +4116,7 @@ class _PolygonalChainSelector(_SelectorWidget):
             # Hide the cursor when interactive zoom/pan is active
             if not self.canvas.widgetlock.available(self) and self._xys:
                 self._xys[-1] = (np.nan, np.nan)
-                self._draw_polygon()
+                self._draw_polygonal_chain()
             return False
 
         else:
@@ -4147,7 +4147,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         else:
             self._move_pending_vertex(event)
 
-        self._draw_polygon()
+        self._draw_polygonal_chain()
 
     def _move_active_vertex(self, event):
         """Move the active vertex to the position of the given event."""
@@ -4164,7 +4164,7 @@ class _PolygonalChainSelector(_SelectorWidget):
                 and ('move_vertex' in self._state or
                      'move_all' in self._state)):
             self._xys.pop()
-            self._draw_polygon()
+            self._draw_polygonal_chain()
 
     def _on_key_release(self, event):
         """Key release event handler."""
@@ -4175,7 +4175,7 @@ class _PolygonalChainSelector(_SelectorWidget):
                 (event.key == self._state_modifier_keys.get('move_vertex')
                  or event.key == self._state_modifier_keys.get('move_all'))):
             self._xys.append((event.xdata, event.ydata))
-            self._draw_polygon()
+            self._draw_polygonal_chain()
         # Complete the open polygonal chain.
         elif self._verify_completion(event):
             self._complete_chain(event)
@@ -4186,7 +4186,7 @@ class _PolygonalChainSelector(_SelectorWidget):
     def _reset_chain(self, event):
         """Reset the polygonal chain."""
 
-    def _draw_polygon_without_update(self):
+    def _draw_polygonal_chain_without_update(self):
         """Redraw the polygon based on new vertex positions, no update()."""
         xs, ys = zip(*self._xys) if self._xys else ([], [])
         self._selection_artist.set_data(xs, ys)
@@ -4196,15 +4196,15 @@ class _PolygonalChainSelector(_SelectorWidget):
         """Update the positions of the vertex handles."""
         self._vertex_handles.set_data(xs, ys)
 
-    def _draw_polygon(self):
+    def _draw_polygonal_chain(self):
         """Redraw the polygon based on the new vertex positions."""
-        self._draw_polygon_without_update()
+        self._draw_polygonal_chain_without_update()
         self.update()
 
     def _clear_without_update(self):
         self._selection_completed = False
         self._xys = [(0, 0)]
-        self._draw_polygon_without_update()
+        self._draw_polygonal_chain_without_update()
 
     @property
     def verts(self):
@@ -4227,7 +4227,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         self._selection_completed = True
         self._post_set_verts()
         self.set_visible(True)
-        self._draw_polygon()
+        self._draw_polygonal_chain()
 
     def _build_vertices(self, xys):
         """Build the vertices list from the given list of ``(x, y)`` pairs."""
@@ -4350,7 +4350,7 @@ class PolygonSelector(_PolygonalChainSelector):
         # by the user
         self._box._allow_creation = False
         self._box._selection_completed = True
-        self._draw_polygon()
+        self._draw_polygonal_chain()
 
     def _remove_box(self):
         if self._box is not None:
@@ -4391,7 +4391,7 @@ class PolygonSelector(_PolygonalChainSelector):
         # Update polygon verts.  Must be a list of tuples for consistency.
         new_verts = [(x, y) for x, y in t.transform(np.array(self.verts))]
         self._xys = [*new_verts, new_verts[0]]
-        self._draw_polygon()
+        self._draw_polygonal_chain()
         self._old_box_extents = self._box.extents
 
     def _remove_vertex(self, i):
@@ -4585,7 +4585,7 @@ class PolylineSelector(_PolygonalChainSelector):
     def _complete_chain(self, event):
         self._xys.pop()
         self._selection_completed = True
-        self._draw_polygon()
+        self._draw_polygonal_chain()
         self.onselect(self.verts)
 
     def _place_vertex(self, event):
