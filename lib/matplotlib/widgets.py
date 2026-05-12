@@ -4195,6 +4195,16 @@ class _PolygonalChainSelector(_SelectorWidget):
     def _reset_chain(self, event):
         """Reset the polygonal chain."""
 
+    def _draw_polygon_without_update(self):
+        """Redraw the polygon based on new vertex positions, no update()."""
+        xs, ys = zip(*self._xys) if self._xys else ([], [])
+        self._selection_artist.set_data(xs, ys)
+        self._update_vertex_handles(xs, ys)
+
+    def _update_vertex_handles(self, xs, ys):
+        """Update the positions of the vertex handles."""
+        self._polygon_handles.set_data(xs, ys)
+
     def _draw_polygon(self):
         """Redraw the polygon based on the new vertex positions."""
         self._draw_polygon_without_update()
@@ -4421,14 +4431,9 @@ class PolygonSelector(_PolygonalChainSelector):
         self._remove_box()
         self.set_visible(True)
 
-    def _draw_polygon_without_update(self):
-        """Redraw the polygon based on new vertex positions, no update()."""
-        xs, ys = zip(*self._xys) if self._xys else ([], [])
-        self._selection_artist.set_data(xs, ys)
+    def _update_vertex_handles(self, xs, ys):
+        """Update the positions of the vertex handles."""
         self._update_box()
-        # Only show one tool handle at the start and end vertex of the polygon
-        # if the polygon is completed or the user is locked on to the start
-        # vertex.
         if (self._selection_completed
                 or (len(self._xys) > 3
                     and self._xys[-1] == self._xys[0])):
@@ -4589,15 +4594,6 @@ class PolylineSelector(_PolygonalChainSelector):
         self._xys = [(event.xdata, event.ydata)]
         self._selection_completed = False
         self.set_visible(True)
-
-    def _draw_polygon_without_update(self):
-        """Redraw the polygon based on new vertex positions, no update()."""
-        xs, ys = zip(*self._xys) if self._xys else ([], [])
-        self._selection_artist.set_data(xs, ys)
-        # Only show one tool handle at the start and end vertex of the polygon
-        # if the polygon is completed or the user is locked on to the start
-        # vertex.
-        self._polygon_handles.set_data(xs, ys)
 
     @property
     def verts(self):
