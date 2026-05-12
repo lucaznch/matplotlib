@@ -4174,9 +4174,9 @@ class _PolygonalChainSelector(_SelectorWidget):
             self._draw_polygonal_chain()
         # Reset the polygon if the released key is the 'clear' key.
         elif event.key == self._state_modifier_keys.get('clear'):
-            self._reset_chain(event)
+            self._reset_polygonal_chain(event)
 
-    def _reset_chain(self, event):
+    def _reset_polygonal_chain(self, event):
         """Reset the polygonal chain."""
 
     def _draw_polygonal_chain_without_update(self):
@@ -4446,7 +4446,8 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._xys[-1] = (event.xdata, event.ydata)
 
-    def _reset_chain(self, event):
+    def _reset_polygonal_chain(self, event):
+        """Reset the polygonal chain."""
         event = self._clean_event(event)
         self._xys = [(event.xdata, event.ydata)]
         self._selection_completed = False
@@ -4611,7 +4612,8 @@ class PolylineSelector(_PolygonalChainSelector):
         if self._verify_completion(event):
             self._complete_chain(event)
 
-    def _reset_chain(self, event):
+    def _reset_polygonal_chain(self, event):
+        """Reset the polygonal chain."""
         event = self._clean_event(event)
         self._xys = [(event.xdata, event.ydata)]
         self._selection_completed = False
