@@ -4180,7 +4180,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         """Reset the polygonal chain."""
 
     def _draw_polygonal_chain_without_update(self):
-        """Redraw the polygon based on new vertex positions, no update()."""
+        """Redraw the polygonal chain based on new vertex positions, no update()."""
         xs, ys = zip(*self._xys) if self._xys else ([], [])
         self._selection_artist.set_data(xs, ys)
         self._update_vertex_handles(xs, ys)
@@ -4190,7 +4190,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         self._vertex_handles.set_data(xs, ys)
 
     def _draw_polygonal_chain(self):
-        """Redraw the polygon based on the new vertex positions."""
+        """Redraw the polygonal chain based on the new vertex positions."""
         self._draw_polygonal_chain_without_update()
         self.update()
 
