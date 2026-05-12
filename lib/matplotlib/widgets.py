@@ -4041,7 +4041,7 @@ class _PolygonalChainSelector(_SelectorWidget):
 
         # TODO: Change the name of this attribute to something else.
         # e.g., _vertex_handles, _chain_handles, etc.
-        self._polygon_handles = ToolHandles(self.ax, [], [],
+        self._vertex_handles = ToolHandles(self.ax, [], [],
                                             useblit=self._useblit,
                                             marker_props=self._handle_props)
         self._active_handle_idx = -1
@@ -4052,7 +4052,7 @@ class _PolygonalChainSelector(_SelectorWidget):
 
     @property
     def _handles_artists(self):
-        return self._polygon_handles.artists
+        return self._vertex_handles.artists
 
     def remove_vertex(self, i):
         if self._selection_completed:
@@ -4075,7 +4075,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         # Check for selection of a tool handle.
         if ((self._selection_completed or 'move_vertex' in self._state)
                 and len(self._xys) > 0):
-            h_idx, h_dist = self._polygon_handles.closest(event.x, event.y)
+            h_idx, h_dist = self._vertex_handles.closest(event.x, event.y)
             if h_dist < self.grab_range:
                 self._active_handle_idx = h_idx
         # Save the vertex positions at the time of the press event (needed to
@@ -4203,7 +4203,7 @@ class _PolygonalChainSelector(_SelectorWidget):
 
     def _update_vertex_handles(self, xs, ys):
         """Update the positions of the vertex handles."""
-        self._polygon_handles.set_data(xs, ys)
+        self._vertex_handles.set_data(xs, ys)
 
     def _draw_polygon(self):
         """Redraw the polygon based on the new vertex positions."""
@@ -4466,9 +4466,9 @@ class PolygonSelector(_PolygonalChainSelector):
         if (self._selection_completed
                 or (len(self._xys) > 3
                     and self._xys[-1] == self._xys[0])):
-            self._polygon_handles.set_data(xs[:-1], ys[:-1])
+            self._vertex_handles.set_data(xs[:-1], ys[:-1])
         else:
-            self._polygon_handles.set_data(xs, ys)
+            self._vertex_handles.set_data(xs, ys)
 
     def _get_vertices(self):
         """Return the polygon vertices as a list of ``(x, y)`` pairs."""
