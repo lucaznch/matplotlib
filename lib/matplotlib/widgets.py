@@ -4050,20 +4050,16 @@ class _PolygonalChainSelector(_SelectorWidget):
         return self._vertex_handles.artists
 
     def remove_vertex(self, i):
+        """Remove vertex handler."""
         if self._selection_completed:
-            # Pretty sure this condition is not needed since the _press() function
-            # verifies this condition before activating the vertex handle,
-            # where _release() sees the handle activation and calls remove_vertex().
-            # but keeping it here for safety until the implementation is complete.
-            # And I suppose it doesn't hurt to have this check here.
             self._remove_vertex(i)
             self._verify_incompletion()
 
     def _remove_vertex(self, i):
-        """Remove vertex i from the polygonal chain."""
+        """Remove vertex with index i."""
 
     def _verify_incompletion(self):
-        """Verify and update selection state after vertex removal."""
+        """Verify incompletion."""
 
     def _press(self, event):
         """Button press event handler."""
@@ -4411,7 +4407,7 @@ class PolygonSelector(_PolygonalChainSelector):
             self._xys.pop(i)
 
     def _verify_incompletion(self):
-        """"Verify and update selection state after vertex removal."""
+        """"Verify incompletion."""
         if len(self._xys) <= 2:
             # If only one point left, return to incomplete state to let user
             # start drawing again
@@ -4576,7 +4572,7 @@ class PolylineSelector(_PolygonalChainSelector):
         self._xys.pop(i)
 
     def _verify_incompletion(self):
-        """Verify and update selection state after vertex removal."""
+        """Verify incompletion."""
         if len(self._xys) == 0:
             # If no points left, return to incomplete state to let user start
             # drawing again
