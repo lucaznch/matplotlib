@@ -4172,9 +4172,6 @@ class _PolygonalChainSelector(_SelectorWidget):
                  or event.key == self._state_modifier_keys.get('move_all'))):
             self._xys.append((event.xdata, event.ydata))
             self._draw_polygonal_chain()
-        # Complete the open polygonal chain.
-        elif self._verify_completion(event):
-            self._complete_chain(event)
         # Reset the polygon if the released key is the 'clear' key.
         elif event.key == self._state_modifier_keys.get('clear'):
             self._reset_chain(event)
@@ -4607,6 +4604,12 @@ class PolylineSelector(_PolygonalChainSelector):
             self._xys.append((event.xdata, event.ydata))
         else:
             self._xys[-1] = (event.xdata, event.ydata)
+
+    def _on_key_release(self, event):
+        """Key release event handler."""
+        super()._on_key_release(event)
+        if self._verify_completion(event):
+            self._complete_chain(event)
 
     def _reset_chain(self, event):
         event = self._clean_event(event)
