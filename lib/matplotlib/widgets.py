@@ -4059,7 +4059,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         """Remove vertex with index i."""
 
     def _verify_incompletion(self):
-        """Verify incompletion."""
+        """Verify and update incompletion of polygonal chain."""
 
     def _press(self, event):
         """Button press event handler."""
@@ -4097,7 +4097,7 @@ class _PolygonalChainSelector(_SelectorWidget):
             self.onselect(self.verts)
 
     def _verify_completion(self, event):
-        """Verify and update selection state after vertex placement."""
+        """Verify completion of the polygonal chain."""
 
     def _complete_chain(self, event):
         """Complete the polygonal chain."""
@@ -4407,7 +4407,7 @@ class PolygonSelector(_PolygonalChainSelector):
             self._xys.pop(i)
 
     def _verify_incompletion(self):
-        """"Verify incompletion."""
+        """Verify and update incompletion of polygonal chain."""
         if len(self._xys) <= 2:
             # If only one point left, return to incomplete state to let user
             # start drawing again
@@ -4415,7 +4415,9 @@ class PolygonSelector(_PolygonalChainSelector):
             self._remove_box()
 
     def _verify_completion(self, event):
-        return len(self._xys) > 3 and self._xys[-1] == self._xys[0]
+        """Verify completion of the polygonal chain."""
+        return (not self._selection_completed
+                and len(self._xys) > 3 and self._xys[-1] == self._xys[0])
 
     def _complete_chain(self, event):
         self._selection_completed = True
@@ -4572,13 +4574,14 @@ class PolylineSelector(_PolygonalChainSelector):
         self._xys.pop(i)
 
     def _verify_incompletion(self):
-        """Verify incompletion."""
+        """Verify and update incompletion of polygonal chain."""
         if len(self._xys) == 0:
             # If no points left, return to incomplete state to let user start
             # drawing again
             self._selection_completed = False
 
     def _verify_completion(self, event):
+        """Verify completion of the polygonal chain."""
         return (not self._selection_completed
                 and event.key == 'enter' and len(self._xys) > 1)
 
