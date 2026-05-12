@@ -4083,16 +4083,10 @@ class _PolygonalChainSelector(_SelectorWidget):
                 self._draw_polygonal_chain()
             self._active_handle_idx = -1
 
-        # Verify if button release is meant to complete the Closed polygonal chain.
-        elif self._verify_completion(event):
-            self._complete_chain(event)
-
         # Place new vertex.
         elif (not self._selection_completed
               and 'move_all' not in self._state
               and 'move_vertex' not in self._state):
-            # IDEA: Remove the above branch
-            # and make that assessment in the _place_vertex method??????
             self._place_vertex(event)
 
         if self._selection_completed:
@@ -4429,7 +4423,11 @@ class PolygonSelector(_PolygonalChainSelector):
 
     def _place_vertex(self, event):
         """Place a vertex at the position of given event."""
-        self._xys.insert(-1, (event.xdata, event.ydata))
+        if self._verify_completion(event):
+            # Pending vertex closed the polygon.
+            self._complete_chain(event)
+        else:
+            self._xys.insert(-1, (event.xdata, event.ydata))
 
     def _move_active_vertex(self, event):
         super()._move_active_vertex(event)
