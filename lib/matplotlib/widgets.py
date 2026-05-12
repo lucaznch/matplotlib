@@ -4205,7 +4205,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         return self._get_vertices()
 
     def _get_vertices(self):
-        """Return the polygon vertices as a list of ``(x, y)`` pairs."""
+        """Get polygonal chain vertices as a list of ``(x, y)`` pairs."""
         return self._xys
 
     @verts.setter
