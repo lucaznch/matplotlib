@@ -4320,9 +4320,6 @@ class PolygonSelector(_PolygonalChainSelector):
         if box_handle_props is None:
             box_handle_props = {}
 
-        # The OG code had a but here:
-        # self._box_handle_props = self._handle_props.update(box_handle_props)
-
         self._box_handle_props = {**self._handle_props, **box_handle_props}
         self._box_props = box_props
 
