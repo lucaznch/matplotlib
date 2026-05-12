@@ -4146,11 +4146,11 @@ class _PolygonalChainSelector(_SelectorWidget):
         self._draw_polygonal_chain()
 
     def _move_active_vertex(self, event):
-        """Move the active vertex to the position of the given event."""
+        """Move active vertex to the position of given event."""
         self._xys[self._active_handle_idx] = (event.xdata, event.ydata)
 
     def _move_pending_vertex(self, event):
-        """Move the pending vertex to the position of the given event."""
+        """Move pending vertex to the position of given event."""
 
     def _on_key_press(self, event):
         """Key press event handler."""
@@ -4430,6 +4430,7 @@ class PolygonSelector(_PolygonalChainSelector):
             self._xys.insert(-1, (event.xdata, event.ydata))
 
     def _move_active_vertex(self, event):
+        """Move active vertex to the position of given event."""
         super()._move_active_vertex(event)
         # Also update the end of the polygon line if the first vertex is
         # the active handle and the polygon is completed.
@@ -4437,6 +4438,7 @@ class PolygonSelector(_PolygonalChainSelector):
             self._xys[-1] = (event.xdata, event.ydata)
 
     def _move_pending_vertex(self, event):
+        """Move pending vertex to the position of given event."""
         # Calculate distance to the start vertex.
         x0, y0 = \
             self._selection_artist.get_transform().transform(self._xys[0])
@@ -4598,7 +4600,10 @@ class PolylineSelector(_PolygonalChainSelector):
         self._xys.append((event.xdata, event.ydata))
 
     def _move_pending_vertex(self, event):
+        """Move pending vertex to the position of given event."""
         if len(self._xys) == 0:
+            # After removal of the only vertex in open polygonal chain,
+            # add new pending vertex at cursor position.
             self._xys.append((event.xdata, event.ydata))
         else:
             self._xys[-1] = (event.xdata, event.ydata)
