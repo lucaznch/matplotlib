@@ -4215,6 +4215,37 @@ class _PolygonalChainSelector(_SelectorWidget):
         self._xys = [(0, 0)]
         self._draw_polygon_without_update()
 
+    @property
+    def verts(self):
+        """The polygon vertices, as a list of ``(x, y)`` pairs."""
+        return self._get_vertices()
+
+    def _get_vertices(self):
+        """Return the polygon vertices as a list of ``(x, y)`` pairs."""
+        return self._xys
+
+    @verts.setter
+    def verts(self, xys):
+        """
+        Set the polygon vertices.
+
+        This will remove any preexisting vertices, creating a complete polygon
+        with the new vertices.
+        """
+        self._xys = self._build_vertices(xys)
+        self._selection_completed = True
+        self._post_set_verts()
+        self.set_visible(True)
+        self._draw_polygon()
+
+    def _build_vertices(self, xys):
+        """Build the vertices list from the given list of ``(x, y)`` pairs."""
+        return [*xys]
+
+    def _post_set_verts(self):
+        """Post-processing after setting vertices, e.g., updating the display."""
+        pass
+
 
 class PolygonSelector(_PolygonalChainSelector):
     """
@@ -4441,25 +4472,17 @@ class PolygonSelector(_PolygonalChainSelector):
         else:
             self._polygon_handles.set_data(xs, ys)
 
-    @property
-    def verts(self):
-        """The polygon vertices, as a list of ``(x, y)`` pairs."""
+    def _get_vertices(self):
+        """Return the polygon vertices as a list of ``(x, y)`` pairs."""
         return self._xys[:-1]
 
-    @verts.setter
-    def verts(self, xys):
-        """
-        Set the polygon vertices.
+    def _build_vertices(self, xys):
+        """Build the vertices list from the given list of ``(x, y)`` pairs."""
+        return [*xys, xys[0]]
 
-        This will remove any preexisting vertices, creating a complete polygon
-        with the new vertices.
-        """
-        self._xys = [*xys, xys[0]]
-        self._selection_completed = True
-        self.set_visible(True)
+    def _post_set_verts(self):
         if self._draw_box and self._box is None:
             self._add_box()
-        self._draw_polygon()
 
 
 class Lasso(AxesWidget):
@@ -4594,21 +4617,3 @@ class PolylineSelector(_PolygonalChainSelector):
         self._xys = [(event.xdata, event.ydata)]
         self._selection_completed = False
         self.set_visible(True)
-
-    @property
-    def verts(self):
-        """The polygon vertices, as a list of ``(x, y)`` pairs."""
-        return self._xys
-
-    @verts.setter
-    def verts(self, xys):
-        """
-        Set the polygon vertices.
-
-        This will remove any preexisting vertices, creating a complete polygon
-        with the new vertices.
-        """
-        self._xys = [*xys]
-        self._selection_completed = True
-        self.set_visible(True)
-        self._draw_polygon()
