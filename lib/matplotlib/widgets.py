@@ -4186,7 +4186,7 @@ class _PolygonalChainSelector(_SelectorWidget):
         self._update_vertex_handles(xs, ys)
 
     def _update_vertex_handles(self, xs, ys):
-        """Update the positions of the vertex handles."""
+        """Update the positions of vertex handles."""
         self._vertex_handles.set_data(xs, ys)
 
     def _draw_polygonal_chain(self):
@@ -4455,7 +4455,7 @@ class PolygonSelector(_PolygonalChainSelector):
         self.set_visible(True)
 
     def _update_vertex_handles(self, xs, ys):
-        """Update the positions of the vertex handles."""
+        """Update the positions of vertex handles."""
         self._update_box()
         if (self._selection_completed
                 or (len(self._xys) > 3
