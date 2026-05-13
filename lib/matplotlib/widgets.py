@@ -4323,67 +4323,6 @@ class PolygonSelector(_PolygonalChainSelector):
         self._box_handle_props = {**self._handle_props, **box_handle_props}
         self._box_props = box_props
 
-    def _get_bbox(self):
-        return self._selection_artist.get_bbox()
-
-    def _add_box(self):
-        self._box = RectangleSelector(self.ax,
-                                      useblit=self._useblit,
-                                      grab_range=self.grab_range,
-                                      handle_props=self._box_handle_props,
-                                      props=self._box_props,
-                                      interactive=True)
-        self._box._state_modifier_keys.pop('rotate')
-        self._box.connect_event('motion_notify_event', self._scale_polygon)
-        self._update_box()
-        # Set state that prevents the RectangleSelector from being created
-        # by the user
-        self._box._allow_creation = False
-        self._box._selection_completed = True
-        self._draw_polygonal_chain()
-
-    def _remove_box(self):
-        if self._box is not None:
-            self._box.set_visible(False)
-            self._box = None
-
-    def _update_box(self):
-        # Update selection box extents to the extents of the polygon
-        if self._box is not None:
-            bbox = self._get_bbox()
-            self._box.extents = [bbox.x0, bbox.x1, bbox.y0, bbox.y1]
-            # Save a copy
-            self._old_box_extents = self._box.extents
-
-    @_call_with_reparented_event
-    def _scale_polygon(self, event):
-        """
-        Scale the polygon selector points when the bounding box is moved or
-        scaled.
-
-        This is set as a callback on the bounding box RectangleSelector.
-        """
-        if not self._selection_completed:
-            return
-
-        if self._old_box_extents == self._box.extents:
-            return
-
-        # Create transform from old box to new box
-        x1, y1, w1, h1 = self._box._rect_bbox
-        old_bbox = self._get_bbox()
-        t = (transforms.Affine2D()
-             .translate(-old_bbox.x0, -old_bbox.y0)
-             .scale(1 / old_bbox.width, 1 / old_bbox.height)
-             .scale(w1, h1)
-             .translate(x1, y1))
-
-        # Update polygon verts.  Must be a list of tuples for consistency.
-        new_verts = [(x, y) for x, y in t.transform(np.array(self.verts))]
-        self._xys = [*new_verts, new_verts[0]]
-        self._draw_polygonal_chain()
-        self._old_box_extents = self._box.extents
-
     def _remove_vertex(self, i):
         """Remove vertex with index i."""
         if (len(self._xys) > 2 and i in (0, len(self._xys) - 1)):
@@ -4473,6 +4412,67 @@ class PolygonSelector(_PolygonalChainSelector):
         """Post-processing after setting vertices."""
         if self._draw_box and self._box is None:
             self._add_box()
+
+    def _get_bbox(self):
+        return self._selection_artist.get_bbox()
+
+    def _add_box(self):
+        self._box = RectangleSelector(self.ax,
+                                      useblit=self._useblit,
+                                      grab_range=self.grab_range,
+                                      handle_props=self._box_handle_props,
+                                      props=self._box_props,
+                                      interactive=True)
+        self._box._state_modifier_keys.pop('rotate')
+        self._box.connect_event('motion_notify_event', self._scale_polygon)
+        self._update_box()
+        # Set state that prevents the RectangleSelector from being created
+        # by the user
+        self._box._allow_creation = False
+        self._box._selection_completed = True
+        self._draw_polygonal_chain()
+
+    def _remove_box(self):
+        if self._box is not None:
+            self._box.set_visible(False)
+            self._box = None
+
+    def _update_box(self):
+        # Update selection box extents to the extents of the polygon
+        if self._box is not None:
+            bbox = self._get_bbox()
+            self._box.extents = [bbox.x0, bbox.x1, bbox.y0, bbox.y1]
+            # Save a copy
+            self._old_box_extents = self._box.extents
+
+    @_call_with_reparented_event
+    def _scale_polygon(self, event):
+        """
+        Scale the polygon selector points when the bounding box is moved or
+        scaled.
+
+        This is set as a callback on the bounding box RectangleSelector.
+        """
+        if not self._selection_completed:
+            return
+
+        if self._old_box_extents == self._box.extents:
+            return
+
+        # Create transform from old box to new box
+        x1, y1, w1, h1 = self._box._rect_bbox
+        old_bbox = self._get_bbox()
+        t = (transforms.Affine2D()
+             .translate(-old_bbox.x0, -old_bbox.y0)
+             .scale(1 / old_bbox.width, 1 / old_bbox.height)
+             .scale(w1, h1)
+             .translate(x1, y1))
+
+        # Update polygon verts.  Must be a list of tuples for consistency.
+        new_verts = [(x, y) for x, y in t.transform(np.array(self.verts))]
+        self._xys = [*new_verts, new_verts[0]]
+        self._draw_polygonal_chain()
+        self._old_box_extents = self._box.extents
 
 
 class Lasso(AxesWidget):
